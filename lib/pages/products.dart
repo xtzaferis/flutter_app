@@ -41,6 +41,22 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 
+  Widget _buildProductsList() {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        Widget content = Center(
+          child: Text('No Products Found!'),
+        );
+        if (model.displayedProducts.length > 0 && !model.isLoading) {
+          content = Products();
+        } else if (model.isLoading) {
+          content = Center(child: CircularProgressIndicator());
+        }
+        return content;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,18 +65,19 @@ class _ProductsPageState extends State<ProductsPage> {
           title: Text('EasyList'),
           actions: <Widget>[
             ScopedModelDescendant<MainModel>(
-              builder:
-                  (BuildContext context, Widget child, MainModel model) {
-                    return IconButton(
-                      icon: Icon(model.displayFavoritesOnly ? Icons.favorite : Icons.favorite_border),
-                      onPressed: () {
-                        model.toogleDisplayMode();
-                      },
-                    );
+              builder: (BuildContext context, Widget child, MainModel model) {
+                return IconButton(
+                  icon: Icon(model.displayFavoritesOnly
+                      ? Icons.favorite
+                      : Icons.favorite_border),
+                  onPressed: () {
+                    model.toogleDisplayMode();
+                  },
+                );
               },
             )
           ],
         ),
-        body: Products());
+        body: _buildProductsList());
   }
 }
