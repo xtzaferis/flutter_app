@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import './product_edit.dart';
+
 import 'package:scoped_model/scoped_model.dart';
+
+import './product_edit.dart';
 import '../scoped-models/main.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -9,12 +11,12 @@ class ProductListPage extends StatefulWidget {
   ProductListPage(this.model);
 
   @override
-  State<StatefulWidget> createState() {
-    return _ProductListPage();
-  } 
+    State<StatefulWidget> createState() {
+      return _ProductListPageState();
+    }
 }
 
-class _ProductListPage extends State<ProductListPage> {
+class _ProductListPageState extends State<ProductListPage> {
   @override
   initState() {
     widget.model.fetchProducts();
@@ -25,16 +27,14 @@ class _ProductListPage extends State<ProductListPage> {
     return IconButton(
       icon: Icon(Icons.edit),
       onPressed: () {
-        model.selectProduct(index);
+        model.selectProduct(model.allProducts[index].id);
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (BuildContext context) {
               return ProductEditPage();
             },
           ),
-        ).then((_) {
-          model.selectProduct(null);
-        });
+        );
       },
     );
   }
@@ -46,27 +46,31 @@ class _ProductListPage extends State<ProductListPage> {
         return ListView.builder(
           itemBuilder: (BuildContext context, int index) {
             return Dismissible(
-              direction: DismissDirection.endToStart,
-              background: Container(
-                color: Colors.red,
-              ),
               key: Key(model.allProducts[index].title),
               onDismissed: (DismissDirection direction) {
-                model.selectProduct(index);
-                model.deleteProduct();
+                if (direction == DismissDirection.endToStart) {
+                  model.selectProduct(model.allProducts[index].id);
+                  model.deleteProduct();
+                } else if (direction == DismissDirection.startToEnd) {
+                  print('Swiped start to end');
+                } else {
+                  print('Other swiping');
+                }
               },
+              background: Container(color: Colors.red),
               child: Column(
                 children: <Widget>[
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: NetworkImage(model.allProducts[index].image),
+                      backgroundImage:
+                          NetworkImage(model.allProducts[index].image),
                     ),
                     title: Text(model.allProducts[index].title),
                     subtitle:
                         Text('\$${model.allProducts[index].price.toString()}'),
                     trailing: _buildEditButton(context, index, model),
                   ),
-                  Divider(),
+                  Divider()
                 ],
               ),
             );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import '../widgets/products/products.dart';
+
 import 'package:scoped_model/scoped_model.dart';
+
+import '../widgets/products/products.dart';
 import '../scoped-models/main.dart';
 
 class ProductsPage extends StatefulWidget {
@@ -42,17 +44,15 @@ class _ProductsPageState extends State<ProductsPage> {
   }
 
   Widget _buildProductsList() {
-    return ScopedModelDescendant<MainModel>(
+    return ScopedModelDescendant(
       builder: (BuildContext context, Widget child, MainModel model) {
-        Widget content = Center(
-          child: Text('No Products Found!'),
-        );
+        Widget content = Center(child: Text('No Products Found!'));
         if (model.displayedProducts.length > 0 && !model.isLoading) {
           content = Products();
         } else if (model.isLoading) {
           content = Center(child: CircularProgressIndicator());
         }
-        return content;
+        return RefreshIndicator(onRefresh: model.fetchProducts, child: content,) ;
       },
     );
   }
@@ -60,24 +60,25 @@ class _ProductsPageState extends State<ProductsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: _buildSideDrawer(context),
-        appBar: AppBar(
-          title: Text('EasyList'),
-          actions: <Widget>[
-            ScopedModelDescendant<MainModel>(
-              builder: (BuildContext context, Widget child, MainModel model) {
-                return IconButton(
-                  icon: Icon(model.displayFavoritesOnly
-                      ? Icons.favorite
-                      : Icons.favorite_border),
-                  onPressed: () {
-                    model.toogleDisplayMode();
-                  },
-                );
-              },
-            )
-          ],
-        ),
-        body: _buildProductsList());
+      drawer: _buildSideDrawer(context),
+      appBar: AppBar(
+        title: Text('EasyList'),
+        actions: <Widget>[
+          ScopedModelDescendant<MainModel>(
+            builder: (BuildContext context, Widget child, MainModel model) {
+              return IconButton(
+                icon: Icon(model.displayFavoritesOnly
+                    ? Icons.favorite
+                    : Icons.favorite_border),
+                onPressed: () {
+                  model.toggleDisplayMode();
+                },
+              );
+            },
+          )
+        ],
+      ),
+      body: _buildProductsList(),
+    );
   }
 }

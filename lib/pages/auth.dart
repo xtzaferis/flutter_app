@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:scoped_model/scoped_model.dart';
+
 import '../scoped-models/main.dart';
 
 class AuthPage extends StatefulWidget {
@@ -29,15 +31,15 @@ class _AuthPageState extends State<AuthPage> {
   Widget _buildEmailTextField() {
     return TextFormField(
       decoration: InputDecoration(
-          labelText: 'Email', filled: true, fillColor: Colors.white),
+          labelText: 'E-Mail', filled: true, fillColor: Colors.white),
+      keyboardType: TextInputType.emailAddress,
       validator: (String value) {
         if (value.isEmpty ||
             !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
                 .hasMatch(value)) {
-          return 'Email is required and should be valid';
+          return 'Please enter a valid email';
         }
       },
-      keyboardType: TextInputType.emailAddress,
       onSaved: (String value) {
         _formData['email'] = value;
       },
@@ -48,12 +50,12 @@ class _AuthPageState extends State<AuthPage> {
     return TextFormField(
       decoration: InputDecoration(
           labelText: 'Password', filled: true, fillColor: Colors.white),
+      obscureText: true,
       validator: (String value) {
         if (value.isEmpty || value.length < 6) {
-          return 'Description is required and should be 6+ characters long';
+          return 'Password invalid';
         }
       },
-      obscureText: true,
       onSaved: (String value) {
         _formData['password'] = value;
       },
@@ -85,7 +87,6 @@ class _AuthPageState extends State<AuthPage> {
   Widget build(BuildContext context) {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Login'),
@@ -104,7 +105,9 @@ class _AuthPageState extends State<AuthPage> {
                 child: Column(
                   children: <Widget>[
                     _buildEmailTextField(),
-                    SizedBox(height: 10.0),
+                    SizedBox(
+                      height: 10.0,
+                    ),
                     _buildPasswordTextField(),
                     _buildAcceptSwitch(),
                     SizedBox(
@@ -114,12 +117,12 @@ class _AuthPageState extends State<AuthPage> {
                       builder: (BuildContext context, Widget child,
                           MainModel model) {
                         return RaisedButton(
-                          child: Text('Login'),
                           textColor: Colors.white,
+                          child: Text('LOGIN'),
                           onPressed: () => _submitForm(model.login),
                         );
                       },
-                    )
+                    ),
                   ],
                 ),
               ),

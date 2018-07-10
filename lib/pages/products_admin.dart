@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import './product_edit.dart';
 import './product_list.dart';
 import '../scoped-models/main.dart';
@@ -10,22 +11,22 @@ class ProductsAdminPage extends StatelessWidget {
 
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
-          child: Column(
-            children: <Widget>[
-              AppBar(
-                automaticallyImplyLeading: false,
-                title: Text('Choose'),
-              ),
-              ListTile(
-                leading: Icon(Icons.shop),
-                title: Text('All Products'),
-                onTap: () {
-                  Navigator.pushReplacementNamed(context, '/products');
-                },
-              )
-            ],
+      child: Column(
+        children: <Widget>[
+          AppBar(
+            automaticallyImplyLeading: false,
+            title: Text('Choose'),
           ),
-        );
+          ListTile(
+            leading: Icon(Icons.shop),
+            title: Text('All Products'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/products');
+            },
+          )
+        ],
+      ),
+    );
   }
 
   @override
@@ -45,14 +46,13 @@ class ProductsAdminPage extends StatelessWidget {
               Tab(
                 icon: Icon(Icons.list),
                 text: 'My Products',
-              )
+              ),
             ],
           ),
         ),
-        body: TabBarView(children: <Widget>[
-          ProductEditPage(),
-          ProductListPage(model)
-        ],),
+        body: TabBarView(
+          children: <Widget>[ProductEditPage(), ProductListPage(model)],
+        ),
       ),
     );
   }
