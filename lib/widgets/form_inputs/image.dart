@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ImageInput extends StatefulWidget {
   @override
@@ -6,6 +9,17 @@ class ImageInput extends StatefulWidget {
 }
 
 class _ImageInputState extends State<ImageInput> {
+  File _imageFile;
+
+  void _getImage(BuildContext context, ImageSource source) {
+    ImagePicker.pickImage(source: source, maxWidth: 400.0).then((File image) {
+      setState(() {
+        _imageFile = image;
+      });
+      Navigator.pop(context);
+    });
+  }
+
   void _openImagePicker(BuildContext context) {
     showModalBottomSheet(
         context: context,
@@ -19,12 +33,16 @@ class _ImageInputState extends State<ImageInput> {
                 SizedBox(height: 10.0),
                 FlatButton(
                   textColor: Theme.of(context).primaryColor,
-                  onPressed: () {},
+                  onPressed: () {
+                    _getImage(context, ImageSource.camera);
+                  },
                   child: Text('Use Camera'),
                 ),
                 FlatButton(
                   textColor: Theme.of(context).primaryColor,
-                  onPressed: () {},
+                  onPressed: () {
+                    _getImage(context, ImageSource.gallery);
+                  },
                   child: Text('Use Gallery'),
                 ),
               ],
@@ -61,6 +79,16 @@ class _ImageInputState extends State<ImageInput> {
             width: 2.0,
           ),
         ),
+        SizedBox(height: 10.0),
+        _imageFile == null
+            ? Text('Please pick an image')
+            : Image.file(
+                _imageFile,
+                fit: BoxFit.cover,
+                height: 300.0,
+                width: MediaQuery.of(context).size.width,
+                alignment: Alignment.topCenter,
+              ),
       ],
     );
   }
