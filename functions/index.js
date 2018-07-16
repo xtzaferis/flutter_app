@@ -1,5 +1,5 @@
 const functions = require('firebase-functions');
-const cors = require('cors')({origin: true});
+const cors = require('cors')({ origin: true });
 const Busboy = require('busboy');
 const os = require('os');
 const path = require('path');
@@ -28,17 +28,17 @@ fbAdmin.initializeApp({
 exports.storeImage = functions.https.onRequest((req, res) => {
     return cors(req, res, () => {
         if (req.method !== 'POST') {
-            return res.status(500).json({message: 'Not allowed.'});
+            return res.status(500).json({ message: 'Not allowed.' });
         }
 
         if (!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) {
-            return res.status(401).json({error: 'Unauthorized.'});
+            return res.status(401).json({ error: 'Unauthorized.' });
         }
 
         let idToken;
         idToken = req.headers.authorization.split('Bearer ')[1];
 
-        const busboy = new Busboy({headers: req.headers});
+        const busboy = new Busboy({ headers: req.headers });
         let uploadData;
         let oldImagePath;
 
@@ -65,18 +65,32 @@ exports.storeImage = functions.https.onRequest((req, res) => {
             }
 
             return fbAdmin.auth().verifyIdToken(idToken)
-            .then(decodedToken => {
-                return bucket.upload(uploadData.filePath, {
-                    uploadType: 'media',
-                    destination: imagePath,
-                    metadata: {
-                        metadata: {}
-                    }
+                .then(decodedToken => {
+                    return bucket.upload(uploadData.filePath, {
+                        uploadType: 'media',
+                        destination: imagePath,
+                        metadata: {
+                            metadata: {
+                                contentType: uploadData.type,
+                                firebaseStorageDownloadToken: id
+                            }
+                        }
+                    });
+                })
+                .then(() => {
+                    return res.status(201).json({
+                        imageUrl: 'https://firebasestorage.googleapis.com/v0/b/' +
+                            bucket.name +
+                            '/o/' +
+                            encodeURIComponent(imagePath) + '?alt=media&token=' +
+                            id,
+                        imagePath: imagePath
+                    });
+                })
+                .catch(error => {
+                    return res.status(401).json({ error: 'Anauthorized!' });
                 });
-            })
-            .catch(error => {
-                return res.status(401).json({error: 'Anauthorized!'});
-            });
         });
+        return busboy.end(req.rawBody);
     });
 });
